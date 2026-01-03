@@ -1,0 +1,31 @@
+package org.example.sponsorship;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+@Getter
+@NoArgsConstructor
+public class SponsorshipCreateRequestDto {
+
+    private String storeName;
+    private String storePhone;
+    private String address;
+
+    private Long supportAmount;
+    private Long extraCost;
+
+    private Boolean receiptReview;
+
+    private LocalDate experienceStartDate;
+    private LocalDate experienceEndDate;
+    private LocalDate deadline;
+
+    private Set<DayOfWeek> availableDays;
+    private String availableTime;
+
+}
