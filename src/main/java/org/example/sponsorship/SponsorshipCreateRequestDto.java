@@ -25,7 +25,7 @@ public class SponsorshipCreateRequestDto {
     private LocalDate experienceEndDate;
     private LocalDate deadline;
 
-    private Set<DayOfWeek> availableDays;
+    private List<String> availableDays;
     private String availableTime;
 
 }
