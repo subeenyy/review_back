@@ -1,16 +1,14 @@
-package org.example.sponsorship;
+package org.example.campaign;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor
-public class SponsorshipCreateRequestDto {
+public class CampaignCreateRequestDto {
 
     private String storeName;
     private String storePhone;

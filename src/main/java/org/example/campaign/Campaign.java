@@ -1,4 +1,4 @@
-package org.example.sponsorship;
+package org.example.campaign;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,16 +12,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "sponsorship")
+@Table(name = "campaign")
 @DynamicUpdate
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Sponsorship {
+public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long campaignId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -55,7 +55,7 @@ public class Sponsorship {
 
 
     @Builder
-    private Sponsorship(
+    private Campaign(
             User user,
             String storeName,
             String storePhone,
@@ -92,9 +92,9 @@ public class Sponsorship {
     }
 
     /* 팩토리 메서드 */
-    public static Sponsorship create(User user, SponsorshipCreateRequestDto req){
+    public static Campaign create(User user, CampaignCreateRequestDto req){
         String csvDays = String.join(",", req.getAvailableDays());
-        return Sponsorship.builder()
+        return Campaign.builder()
                 .user(user)
                 .storeName(req.getStoreName())
                 .storePhone(req.getStorePhone())

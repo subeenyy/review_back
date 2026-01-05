@@ -19,6 +19,7 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
@@ -43,12 +44,50 @@ public class AuthController {
             throw new BadCredentialsException("비밀번호가 틀립니다.");
         }
 
-        // 3. JWT 토큰 생성
-        String token = jwtTokenProvider.createToken(saved.getId());
+        String accessToken =
+                jwtTokenProvider.createAccessToken(saved.getId());
+        String refreshToken =
+                jwtTokenProvider.createRefreshToken(saved.getId());
 
-        // 4. 토큰 응답
-        return ResponseEntity.ok(new LoginResponse(token));
+
+        refreshTokenRepository.save(
+                new RefreshToken(saved.getId(), refreshToken)
+        );
+
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        accessToken,
+                        refreshToken,
+                        System.currentTimeMillis() + 3600000
+                )
+        );
+
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(
+            @RequestBody RefreshRequest request
+    ) {
+        Long userId = jwtTokenProvider.getUserId(request.getRefreshToken());
+
+        RefreshToken saved = refreshTokenRepository.findById(userId)
+                        .orElseThrow();
+
+        if (!saved.getToken().equals(request.getRefreshToken())) {
+            throw new IllegalStateException("유효하지 않은 토큰");
+        }
+
+        String newAccess = jwtTokenProvider.createAccessToken(userId);
+
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        newAccess,
+                        saved.getToken(),
+                        System.currentTimeMillis() + 3600000
+                )
+        );
+    }
+
 
 }
 

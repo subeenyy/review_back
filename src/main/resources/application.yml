@@ -50,4 +50,5 @@ management:
 
 jwt:
   secret: "very-very-secret-key-that-is-at-least-32-bytes"
-  validity: 3600000 # 1시간 (밀리초)
+  access-validity: 3600000      # 1시간
+  refresh-validity: 1209600000  # 14일

@@ -1,4 +1,4 @@
-package org.example.sponsorship;
+package org.example.campaign;
 
 public enum Status {
     PENDING,

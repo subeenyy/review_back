@@ -1,4 +1,4 @@
-package org.example.sponsorship;
+package org.example.campaign;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,73 +12,73 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/sponsorship")
+@RequestMapping("/campaign")
 @RequiredArgsConstructor
-public class SponsorshipController {
+public class CampaignController {
 
-    private final SponsorshipService sponsorshipService;
+    private final CampaignService campaignService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final SponsorshipMapper sponsorshipMapper;
+    private final CampaignMapper campaignMapper;
 
-    @GetMapping("/{id}")
-    public SponsorshipResponseDto getSponsorshipById(
-            @PathVariable Long id,
+    @GetMapping("/{campaignId}")
+    public CampaignResponseDto getCampaignById(
+            @PathVariable Long campaignId,
             @RequestHeader("Authorization") String token
     ) {
         Long userId = extractUserId(token);
 
-        Sponsorship s = sponsorshipService.findByIdAndUser(id, userId)
+        Campaign s = campaignService.findByCampaignIdAndUser(campaignId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 건을 찾을 수 없습니다"));;
 
-        return SponsorshipResponseDto.fromEntity(s);
+        return CampaignResponseDto.fromEntity(s);
     }
 
 
     @PostMapping
-    public Sponsorship createSponsorship(
+    public Campaign createCampaign(
             @RequestHeader("Authorization") String token,
-            @RequestBody @Valid SponsorshipCreateRequestDto sponsorship
+            @RequestBody @Valid CampaignCreateRequestDto sponsorship
     ) {
         Long userId = extractUserId(token);
-        return sponsorshipService.createSponsorship(userId, sponsorship);
+        return campaignService.createCampaign(userId, sponsorship);
     }
 
     @GetMapping
-    public List<SponsorshipResponseDto> getSponsorships(
+    public List<CampaignResponseDto> getSponsorships(
             @RequestHeader("Authorization") String token
     ) {
         Long userId = extractUserId(token);
-        return sponsorshipService.findAllByUserId(userId)
+        return campaignService.findAllByUserId(userId)
                 .stream()
-                .map(SponsorshipResponseDto::fromEntity)
+                .map(CampaignResponseDto::fromEntity)
                 .toList();
     }
 
-    @PatchMapping("/{id}/{userId}")
-    public SponsorshipResponseDto updateSponsorship(
+    @PatchMapping("/{campaignId}/{userId}")
+    public CampaignResponseDto updateSponsorship(
             @PathVariable Long userId,
-            @PathVariable Long id,
+            @PathVariable Long campaignId,
             @RequestHeader("Authorization") String token,
-            @RequestBody SponsorshipResponseDto dto
+            @RequestBody CampaignResponseDto dto
     ) {
         Long tokenUserId = extractUserId(token);
         if (!tokenUserId.equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다");
         }
 
-        Sponsorship updated = sponsorshipService.updateSponsorship(id,dto);
-        return SponsorshipResponseDto.fromEntity(updated);
+        Campaign updated = campaignService.updateCampaign(campaignId,dto);
+        return CampaignResponseDto.fromEntity(updated);
     }
 
 
-    @PatchMapping("/{id}/status/{status}")
+    @PatchMapping("/{campaignId}/status/{status}")
     public void changeStatus(
-            @PathVariable Long id,
-            @PathVariable SponsorshipAction status,
+            @PathVariable Long campaignId,
+            @PathVariable CampaignAction status,
             @RequestHeader("Authorization") String token
     ) {
         Long userId = extractUserId(token);
-        sponsorshipService.changeStatus(id, userId, status);
+        campaignService.changeStatus(campaignId, userId, status);
     }
 
     private Long extractUserId(String authHeader) {

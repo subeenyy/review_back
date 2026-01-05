@@ -1,4 +1,4 @@
-package org.example.sponsorship;
+package org.example.campaign;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -8,10 +8,10 @@ import java.util.List;
 
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface SponsorshipMapper {
-    @Mapping(target = "id", ignore = true)
+public interface CampaignMapper {
+    @Mapping(target = "campaignId", ignore = true)
     @Mapping(target = "status", ignore = true)
-    void updateFromDto(SponsorshipResponseDto dto, @MappingTarget Sponsorship entity);
+    void updateFromDto(CampaignResponseDto dto, @MappingTarget Campaign entity);
 
     default String map(List<String> value) {
         if (value == null) return null;

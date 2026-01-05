@@ -1,4 +1,4 @@
-package org.example.sponsorship;
+package org.example.campaign;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SponsorshipResponseDto {
+public class CampaignResponseDto {
     private Long id;
     private String storeName;
     private String storePhone;
@@ -29,12 +29,12 @@ public class SponsorshipResponseDto {
     private String availableTime;
     private String status;
 
-    public static SponsorshipResponseDto fromEntity(Sponsorship s) {
+    public static CampaignResponseDto fromEntity(Campaign s) {
         List<String> avaliavleDaysList = s.getAvailableDays() == null
                 ? Collections.emptyList()
                 : Arrays.asList(s.getAvailableDays().split(","));
-        return new SponsorshipResponseDto(
-                s.getId(),
+        return new CampaignResponseDto(
+                s.getCampaignId(),
                 s.getStoreName(),
                 s.getStorePhone(),
                 s.getAddress(),
