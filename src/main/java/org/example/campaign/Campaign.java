@@ -21,7 +21,8 @@ public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long campaignId;
+    @Column(name = "campaignId")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -47,11 +48,20 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private String reviewUrl;
+    private String platform;
+
     // 상태 변경 메서드
     public void reserve() { if (status != Status.PENDING) throw new IllegalStateException("PENDING 상태에서만 예약 가능"); status = Status.RESERVED; }
     public void visit() { if (status != Status.RESERVED) throw new IllegalStateException("RESERVED 상태에서만 방문 처리 가능"); status = Status.VISITED; }
     public void complete() { if (status != Status.VISITED) throw new IllegalStateException("VISITED 상태에서만 완료 처리 가능"); status = Status.DONE; }
     public void cancel() { status = Status.CANCELED; }
+
+    public void completeReview(String reviewUrl) {
+        if (status != Status.VISITED) throw new IllegalStateException("VISITED 상태에서만 완료 처리 가능");
+        this.reviewUrl = reviewUrl;
+        this.status = Status.DONE;
+    }
 
 
     @Builder
@@ -68,7 +78,9 @@ public class Campaign {
             LocalDate deadline,
             String availableDays,
             String availableTime,
-            Status status
+            Status status,
+            String reviewUrl,
+            String platform
     ) {
         this.user = user;
         this.storeName = storeName;
@@ -83,6 +95,8 @@ public class Campaign {
         this.availableDays = availableDays;
         this.availableTime = availableTime;
         this.status = status;
+        this.reviewUrl = reviewUrl;
+        this.platform = platform;
     }
 
     // Entity → DTO 변환
@@ -108,6 +122,8 @@ public class Campaign {
                 .availableDays(csvDays)
                 .availableTime(req.getAvailableTime())
                 .status(Status.PENDING)
+                .reviewUrl(req.getReviewUrl())
+                .platform(req.getPlatform())
                 .build();
     }
 

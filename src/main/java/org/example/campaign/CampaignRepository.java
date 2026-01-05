@@ -9,7 +9,7 @@ public interface CampaignRepository
         extends JpaRepository<Campaign, Long> {
 
     List<Campaign> findByUserId(Long userId);
-
-    Optional<Campaign> findByCampaignIdAndUserId(Long campaignId, Long userId);
+    Optional<Campaign> findByIdAndUser_Id(Long campaignId, Long userId);
+    boolean existsByIdAndUser_Id(Long campaignId, Long userId);
 }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CampaignMapper {
-    @Mapping(target = "campaignId", ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
     void updateFromDto(CampaignResponseDto dto, @MappingTarget Campaign entity);
 

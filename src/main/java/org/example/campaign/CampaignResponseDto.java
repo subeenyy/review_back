@@ -34,7 +34,7 @@ public class CampaignResponseDto {
                 ? Collections.emptyList()
                 : Arrays.asList(s.getAvailableDays().split(","));
         return new CampaignResponseDto(
-                s.getCampaignId(),
+                s.getId(),
                 s.getStoreName(),
                 s.getStorePhone(),
                 s.getAddress(),

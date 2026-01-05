@@ -22,7 +22,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -41,6 +41,10 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
     p6spy: DEBUG
+    root: info
+    org.springframework.data.jpa.repository: error
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
 
 management:
   endpoints:

@@ -1,9 +1,12 @@
 package org.example.campaign;
 
 import lombok.RequiredArgsConstructor;
+import org.example.review.ReviewSubmittedEvent;
 import org.example.user.User;
 import org.example.user.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,6 +23,8 @@ public class CampaignService {
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
     private final CampaignMapper campaignMapper;
+    private final KafkaTemplate<String, ReviewSubmittedEvent> kafkaTemplate;
+
 
     public Campaign createCampaign(Long userId, CampaignCreateRequestDto request) {
         User user = userRepository.findById(userId)
@@ -37,7 +42,7 @@ public class CampaignService {
 
 
     public void changeStatus(Long campaignId, Long userId, CampaignAction status) {
-        Campaign s = campaignRepository.findByCampaignIdAndUserId(campaignId, userId)
+        Campaign s = campaignRepository.findByIdAndUser_Id(campaignId, userId)
                 .orElseThrow();
 
         switch (status) {
@@ -52,14 +57,14 @@ public class CampaignService {
 
     @Transactional(readOnly = true)
     public Optional<Campaign> findByCampaignIdAndUser(Long campaignId, Long userId) {
-        return campaignRepository.findByCampaignIdAndUserId(campaignId, userId);
+        return campaignRepository.findByIdAndUser_Id(campaignId, userId);
     }
 
     public Campaign save(Campaign campaign) {
         return campaignRepository.save(campaign);
     }
 
-    @Transactional
+
     public Campaign updateCampaign(Long campaignId, CampaignResponseDto dto) {
         Campaign existing = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -67,5 +72,25 @@ public class CampaignService {
 
         return campaignRepository.save(existing);
     }
+
+    public void submitReview(Long campaignId, Long userId, String reviewUrl) {
+
+        Campaign campaign = campaignRepository
+                .findByIdAndUser_Id(campaignId, userId)
+                .orElseThrow(() -> new AccessDeniedException("본인 캠페인이 아닙니다."));
+
+        if (campaign.getStatus() != Status.VISITED) {
+            throw new IllegalStateException("방문 완료 상태에서만 리뷰 등록 가능");
+        }
+
+        campaign.setReviewUrl(reviewUrl);
+        campaign.complete(); // DONE
+
+        kafkaTemplate.send(
+                "review-submitted",
+                new ReviewSubmittedEvent(campaign.getId(), userId, reviewUrl)
+        );
+    }
+
 
 }

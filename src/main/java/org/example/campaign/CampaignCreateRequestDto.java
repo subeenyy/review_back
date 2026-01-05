@@ -25,5 +25,7 @@ public class CampaignCreateRequestDto {
 
     private List<String> availableDays;
     private String availableTime;
+    private String reviewUrl;
+    private String platform;
 
 }
