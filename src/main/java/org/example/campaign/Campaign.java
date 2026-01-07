@@ -2,6 +2,7 @@ package org.example.campaign;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.platform.Platform;
 import org.example.user.User;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -27,6 +28,15 @@ public class Campaign {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name = "platform_id", nullable = false)
+    private Platform platform;
+
+    @Column(nullable = false)
+    private boolean rewardEnabled;
+
+    private Long rewardPolicyId;
+
     private String storeName;
     private String storePhone;
     private String address;
@@ -49,7 +59,6 @@ public class Campaign {
     private Status status;
 
     private String reviewUrl;
-    private String platform;
 
     // 상태 변경 메서드
     public void reserve() { if (status != Status.PENDING) throw new IllegalStateException("PENDING 상태에서만 예약 가능"); status = Status.RESERVED; }
@@ -67,6 +76,10 @@ public class Campaign {
     @Builder
     private Campaign(
             User user,
+            Platform platform,
+            boolean rewardEnabled,
+            Long rewardPolicyId,
+
             String storeName,
             String storePhone,
             String address,
@@ -79,10 +92,13 @@ public class Campaign {
             String availableDays,
             String availableTime,
             Status status,
-            String reviewUrl,
-            String platform
+            String reviewUrl
     ) {
         this.user = user;
+        this.platform = platform;
+        this.rewardEnabled = rewardEnabled;
+        this.rewardPolicyId = rewardPolicyId;
+
         this.storeName = storeName;
         this.storePhone = storePhone;
         this.address = address;
@@ -96,8 +112,8 @@ public class Campaign {
         this.availableTime = availableTime;
         this.status = status;
         this.reviewUrl = reviewUrl;
-        this.platform = platform;
     }
+
 
     // Entity → DTO 변환
     public Set<DayOfWeek> getAvailableDaysAsSet(com.fasterxml.jackson.databind.ObjectMapper objectMapper) throws com.fasterxml.jackson.core.JsonProcessingException {
@@ -106,10 +122,20 @@ public class Campaign {
     }
 
     /* 팩토리 메서드 */
-    public static Campaign create(User user, CampaignCreateRequestDto req){
+    public static Campaign create(
+            User user,
+            Platform platform,
+            boolean rewardEnabled,
+            Long rewardPolicyId,
+            CampaignCreateRequestDto req
+    ) {
         String csvDays = String.join(",", req.getAvailableDays());
+
         return Campaign.builder()
                 .user(user)
+                .platform(platform)
+                .rewardEnabled(rewardEnabled)
+                .rewardPolicyId(rewardPolicyId)
                 .storeName(req.getStoreName())
                 .storePhone(req.getStorePhone())
                 .address(req.getAddress())
@@ -122,10 +148,10 @@ public class Campaign {
                 .availableDays(csvDays)
                 .availableTime(req.getAvailableTime())
                 .status(Status.PENDING)
-                .reviewUrl(req.getReviewUrl())
-                .platform(req.getPlatform())
+                .reviewUrl(null)
                 .build();
     }
+
 
     public void changeStatus(Status status) {
         this.status = status;

@@ -2,12 +2,15 @@ package org.example.campaign;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.platform.Platform;
+import org.example.platform.PlatformRepository;
 import org.example.review.ReviewSubmittedEvent;
 import org.example.user.User;
 import org.example.user.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +26,7 @@ import java.util.Optional;
 public class CampaignService {
 
     private final CampaignRepository campaignRepository;
+    private final PlatformRepository platformRepository;
     private final UserRepository userRepository;
     private final CampaignMapper campaignMapper;
     private final KafkaTemplate<String, ReviewSubmittedEvent> kafkaTemplate;
@@ -32,9 +36,20 @@ public class CampaignService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
-        Campaign sponsorship = Campaign.create(user, request);
+        Platform platform = platformRepository.findById(request.getPlatformId())
+                .orElseThrow(()-> new IllegalArgumentException("플랫폼 없음"));
+        
+        boolean rewardEnabled = platform.isRewardEnabled();
+        Long rewardPolicyId = platform.getRewardPolicyId();
 
-        return campaignRepository.save(sponsorship);
+        Campaign campaign = Campaign.create(
+                user,
+                platform,
+                rewardEnabled,
+                rewardPolicyId,
+                request
+        );
+        return campaignRepository.save(campaign);
     }
 
 
