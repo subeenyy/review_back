@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/campaign")
+@RequestMapping("/campaigns")
 @RequiredArgsConstructor
 public class CampaignController {
 
@@ -55,6 +55,9 @@ public class CampaignController {
                 .toList();
     }
 
+    
+    
+    
     @PatchMapping("/{campaignId}")
     public CampaignResponseDto updateCampaign(
             @PathVariable Long campaignId,
