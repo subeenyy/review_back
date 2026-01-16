@@ -124,5 +124,10 @@ public class CampaignService {
 
     }
 
+    public List<Campaign> findByUserIdAndStatus(Long userId, Status status) {
+        return campaignRepository.findByUserIdAndStatus(userId, status);
+    }
+
+
 
 }

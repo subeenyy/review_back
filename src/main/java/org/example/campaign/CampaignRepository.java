@@ -17,5 +17,7 @@ public interface CampaignRepository
     List<Campaign> findByUserId(Long userId);
     Optional<Campaign> findByIdAndUser_Id(Long campaignId, Long userId);
     boolean existsByIdAndUser_Id(Long campaignId, Long userId);
+    List<Campaign> findByUserIdAndStatus(Long userId, Status status);
+
 }
 

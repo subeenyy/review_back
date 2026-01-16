@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.auth.JwtTokenProvider;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -101,6 +103,19 @@ public class CampaignController {
         Long userId = extractUserId(token);
         campaignService.submitReview(campaignId, userId, reviewUrl);
         return ResponseEntity.ok("Review submitted and reward triggered");
+    }
+
+
+    @GetMapping("/status/{status}")
+    public List<CampaignResponseDto> getCampaignsByStatus(
+            @RequestHeader("Authorization") String token,
+            @RequestParam Status status
+    ){
+        Long userId = extractUserId(token);
+        return campaignService.findByUserIdAndStatus(userId, status)
+                .stream()
+                .map(CampaignResponseDto::fromEntity)
+                .toList();
     }
 
 }
