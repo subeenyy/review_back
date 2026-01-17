@@ -7,6 +7,9 @@ import org.example.platform.PlatformRepository;
 import org.example.review.ReviewSubmittedEvent;
 import org.example.user.User;
 import org.example.user.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +34,7 @@ public class CampaignService {
     private final UserRepository userRepository;
     private final CampaignMapper campaignMapper;
     private final KafkaTemplate<String, ReviewSubmittedEvent> kafkaTemplate;
-
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public Campaign createCampaign(Long userId, CampaignCreateRequestDto request) {
         User user = userRepository.findById(userId)
@@ -124,10 +128,28 @@ public class CampaignService {
 
     }
 
-    public List<Campaign> findByUserIdAndStatus(Long userId, Status status) {
-        return campaignRepository.findByUserIdAndStatus(userId, status);
-    }
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "campaigns",
+            key = "'user:' + #userId + ':status:' + #status + ':order:' + #sort"
+    )
+    public List<CampaignResponseDto> findCampaigns(
+            Long userId,
+            Status status,
+            Sort sort
+    ) {
+        List<Campaign> campaigns;
 
+        if (status == null) {
+            campaigns = campaignRepository.findByUserId(userId);
+        } else {
+            campaigns = campaignRepository.findByUserIdAndStatus(userId, status, sort);
+        }
+
+        return campaigns.stream()
+                .map(CampaignResponseDto::fromEntity)
+                .toList();
+    }
 
 
 }

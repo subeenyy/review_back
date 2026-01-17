@@ -1,5 +1,6 @@
 package org.example.campaign;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,7 +18,7 @@ public interface CampaignRepository
     List<Campaign> findByUserId(Long userId);
     Optional<Campaign> findByIdAndUser_Id(Long campaignId, Long userId);
     boolean existsByIdAndUser_Id(Long campaignId, Long userId);
-    List<Campaign> findByUserIdAndStatus(Long userId, Status status);
+    List<Campaign> findByUserIdAndStatus(Long userId, Status status, Sort sort);
 
 }
 
