@@ -25,6 +25,7 @@ public class CampaignResponseDto {
     private LocalDate experienceStartDate;
     private LocalDate experienceEndDate;
     private LocalDate deadline;
+    private LocalDate visitDate;
     private List<String> availableDays;
     private String availableTime;
     private String status;
@@ -46,6 +47,7 @@ public class CampaignResponseDto {
                 s.getExperienceStartDate(),
                 s.getExperienceEndDate(),
                 s.getDeadline(),
+                s.getVisitDate(),
                 availableDaysList,
                 s.getAvailableTime(),
                 s.getStatus().name());

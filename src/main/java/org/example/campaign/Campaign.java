@@ -49,6 +49,7 @@ public class Campaign extends BaseEntity {
     private LocalDate experienceStartDate;
     private LocalDate experienceEndDate;
     private LocalDate deadline;
+    private LocalDate visitDate; // 방문일 (RESERVED 상태에서 설정)
 
     @Column(name = "available_days", length = 50)
     private String availableDays;
@@ -61,10 +62,13 @@ public class Campaign extends BaseEntity {
     private String reviewUrl;
 
     // 상태 변경 메서드
-    public void reserve() {
+    public void reserve(LocalDate visitDate) {
         if (status != Status.PENDING)
             throw new IllegalStateException("PENDING 상태에서만 예약 가능");
-        status = Status.RESERVED;
+        if (visitDate == null)
+            throw new IllegalArgumentException("방문일은 필수입니다.");
+        this.status = Status.RESERVED;
+        this.visitDate = visitDate;
     }
 
     public void visit() {
@@ -106,6 +110,7 @@ public class Campaign extends BaseEntity {
             LocalDate experienceStartDate,
             LocalDate experienceEndDate,
             LocalDate deadline,
+            LocalDate visitDate,
             String availableDays,
             String availableTime,
             Status status,
@@ -124,6 +129,7 @@ public class Campaign extends BaseEntity {
         this.experienceStartDate = experienceStartDate;
         this.experienceEndDate = experienceEndDate;
         this.deadline = deadline;
+        this.visitDate = visitDate;
         this.availableDays = availableDays;
         this.availableTime = availableTime;
         this.status = status;

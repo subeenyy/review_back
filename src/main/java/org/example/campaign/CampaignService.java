@@ -54,18 +54,17 @@ public class CampaignService {
         return campaignRepository.findByUserId(userId);
     }
 
-    public void changeStatus(Long campaignId, Long userId, CampaignAction status) {
+    public void changeStatus(Long campaignId, Long userId, CampaignAction status, java.time.LocalDate visitDate) {
         Campaign s = campaignRepository.findByIdAndUser_Id(campaignId, userId)
                 .orElseThrow();
 
         switch (status) {
-            case RESERVE -> s.reserve();
+            case RESERVE -> s.reserve(visitDate);
             case VISIT -> s.visit();
             case COMPLETE -> s.complete();
             case CANCEL -> s.cancel();
             default -> throw new IllegalArgumentException("지원 상태로 되돌릴 수 없음");
         }
-
     }
 
     @Transactional(readOnly = true)

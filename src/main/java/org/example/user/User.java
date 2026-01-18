@@ -27,4 +27,17 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(unique = true)
+    private String kakaoUserId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private LoginType loginType = LoginType.REGULAR;
+
+    public enum LoginType {
+        REGULAR,
+        KAKAO
+    }
 }

@@ -4,8 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.auth.JwtTokenProvider;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,9 +76,10 @@ public class CampaignController {
         public void changeStatus(
                         @PathVariable Long campaignId,
                         @PathVariable CampaignAction status,
+                        @RequestParam(required = false) java.time.LocalDate visitDate,
                         @RequestHeader("Authorization") String token) {
                 Long userId = extractUserId(token);
-                campaignService.changeStatus(campaignId, userId, status);
+                campaignService.changeStatus(campaignId, userId, status, visitDate);
         }
 
         private Long extractUserId(String authHeader) {
