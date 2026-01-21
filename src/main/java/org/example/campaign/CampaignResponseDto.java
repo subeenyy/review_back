@@ -3,6 +3,7 @@ package org.example.campaign;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,14 +12,15 @@ import java.util.List;
 @lombok.Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CampaignResponseDto {
+public class CampaignResponseDto implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private String storeName;
     private String storePhone;
     private String address;
     private Long platformId;
-    private String platformName; // 추가
+    private String platformName;
     private Long categoryId;
     private String categoryName;
     private Long supportAmount;
@@ -43,7 +45,7 @@ public class CampaignResponseDto {
                 s.getStorePhone(),
                 s.getAddress(),
                 s.getPlatform().getPlatformId(),
-                s.getPlatform().getName(), // platformName
+                s.getPlatform().getName(),
                 s.getCategory() != null ? s.getCategory().getId() : null,
                 s.getCategory() != null ? s.getCategory().getName() : null,
                 s.getSupportAmount(),

@@ -36,6 +36,7 @@ public class CampaignService {
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
     public Campaign createCampaign(Long userId, CampaignCreateRequestDto request) {
+        log.info(">>> [CACHE] Evicting 'campaigns' cache for createCampaign");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
@@ -64,6 +65,8 @@ public class CampaignService {
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
     public void changeStatus(Long campaignId, Long userId, CampaignAction status, java.time.LocalDate visitDate) {
+        log.info(">>> [CACHE] Evicting 'campaigns' cache for changeStatus. campaignId={}, status={}", campaignId,
+                status);
         Campaign s = campaignRepository.findByIdAndUser_Id(campaignId, userId)
                 .orElseThrow();
 
@@ -92,6 +95,7 @@ public class CampaignService {
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
     public Campaign updateCampaign(Long campaignId, Long userId, CampaignResponseDto dto) {
+        log.info(">>> [CACHE] Evicting 'campaigns' cache for updateCampaign. campaignId={}", campaignId);
         Campaign existing = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -117,6 +121,7 @@ public class CampaignService {
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
     public void submitReview(Long campaignId, Long userId, String reviewUrl) {
+        log.info(">>> [CACHE] Evicting 'campaigns' cache for submitReview. campaignId={}", campaignId);
 
         Campaign campaign = campaignRepository
                 .findByIdAndUser_Id(campaignId, userId)
@@ -151,6 +156,8 @@ public class CampaignService {
             Long userId,
             Status status,
             Sort sort) {
+        log.info(">>> [CACHE] MISS - Fetching campaigns from DB for userId={}, status={}, sort={}", userId, status,
+                sort);
         List<Campaign> campaigns;
 
         if (status == null) {
@@ -166,6 +173,7 @@ public class CampaignService {
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
     public void deleteCampaign(Long campaignId, Long userId) {
+        log.info(">>> [CACHE] Evicting 'campaigns' cache for deleteCampaign. campaignId={}", campaignId);
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "캠페인을 찾을 수 없습니다."));
 
