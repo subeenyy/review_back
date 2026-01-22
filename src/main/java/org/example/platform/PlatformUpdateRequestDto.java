@@ -1,9 +1,9 @@
 package org.example.platform;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class PlatformUpdateRequestDto {
     private String name;
@@ -11,4 +11,3 @@ public class PlatformUpdateRequestDto {
     private Long rewardPolicyId;
     private Boolean active;
 }
-

@@ -102,6 +102,7 @@ public class Campaign extends BaseEntity {
 
     @Builder
     private Campaign(
+            Long id,
             User user,
             Platform platform,
             Category category,
@@ -122,6 +123,7 @@ public class Campaign extends BaseEntity {
             String availableTime,
             Status status,
             String reviewUrl) {
+        this.id = id;
         this.user = user;
         this.platform = platform;
         this.category = category;

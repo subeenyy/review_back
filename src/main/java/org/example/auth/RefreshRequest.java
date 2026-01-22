@@ -1,9 +1,9 @@
 package org.example.auth;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class RefreshRequest {
     private String refreshToken;
