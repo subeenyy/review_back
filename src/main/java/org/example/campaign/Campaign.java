@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "campaign")
+@Table(name = "campaign", indexes = {
+        @Index(name = "idx_campaign_user_visit", columnList = "user_id, visit_date"),
+        @Index(name = "idx_campaign_user_deadline", columnList = "user_id, deadline")
+})
 @DynamicUpdate
 @Getter
 @Setter

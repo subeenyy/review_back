@@ -12,6 +12,10 @@ import org.example.user.UserRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -56,7 +60,8 @@ public class CampaignService {
                 rewardEnabled,
                 rewardPolicyId,
                 request);
-        return campaignRepository.save(campaign);
+        log.info(">>> [DB] Saving new campaign for user: {}", userId);
+        return campaignRepository.saveAndFlush(campaign);
     }
 
     public List<Campaign> findAllByUserId(Long userId) {
@@ -82,6 +87,9 @@ public class CampaignService {
             case CANCEL -> s.cancel();
             default -> throw new IllegalArgumentException("지원 상태로 되돌릴 수 없음");
         }
+        log.info(">>> [DB] Saving campaign status change. campaignId={}, action={}", campaignId, status);
+        campaignRepository.saveAndFlush(s);
+        log.info(">>> [CACHE] Evicted 'campaigns' cache for changeStatus.");
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +124,8 @@ public class CampaignService {
 
         campaignMapper.updateFromDto(dto, existing);
 
-        return campaignRepository.save(existing);
+        log.info(">>> [DB] Updating campaign details. campaignId={}", campaignId);
+        return campaignRepository.saveAndFlush(existing);
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
@@ -133,6 +142,9 @@ public class CampaignService {
 
         campaign.setReviewUrl(reviewUrl);
         campaign.complete(); // DONE
+        log.info(">>> [DB] Saving campaign review. campaignId={}", campaignId);
+        campaignRepository.saveAndFlush(campaign);
+        log.info(">>> [CACHE] Evicted 'campaigns' cache for submitReview.");
         kafkaTemplate.send(
                 "review-submitted",
                 new ReviewSubmittedEvent(campaign.getId(), userId, reviewUrl)).whenComplete((result, ex) -> {
@@ -169,6 +181,94 @@ public class CampaignService {
         return campaigns.stream()
                 .map(CampaignResponseDto::fromEntity)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CampaignMonthlyStatisticsResponse getMonthlyStatistics(Long userId, String startMonthStr, String endMonthStr,
+            String base, Long categoryId) {
+        YearMonth startMonth = YearMonth.parse(startMonthStr);
+        YearMonth endMonth = YearMonth.parse(endMonthStr);
+        LocalDate start = startMonth.atDay(1);
+        LocalDate end = endMonth.atEndOfMonth();
+
+        List<Campaign> campaigns;
+        if ("visitDate".equalsIgnoreCase(base)) {
+            campaigns = (categoryId == null)
+                    ? campaignRepository.findByUserIdAndVisitDateBetween(userId, start, end)
+                    : campaignRepository.findByUserIdAndVisitDateBetweenAndCategory(userId, start, end, categoryId);
+        } else {
+            campaigns = (categoryId == null)
+                    ? campaignRepository.findByUserIdAndDeadlineBetween(userId, start, end)
+                    : campaignRepository.findByUserIdAndDeadlineBetweenAndCategory(userId, start, end, categoryId);
+        }
+
+        // Group by month
+        Map<String, List<Campaign>> grouped = campaigns.stream()
+                .collect(Collectors.groupingBy(c -> {
+                    LocalDate date = "visitDate".equalsIgnoreCase(base) ? c.getVisitDate() : c.getDeadline();
+                    return YearMonth.from(date).toString();
+                }));
+
+        List<CampaignMonthlyStatisticsResponse.MonthlyMetrics> monthlyData = new ArrayList<>();
+        Map<String, Long> overallStatusDistribution = new HashMap<>();
+
+        // Fill all months in range
+        YearMonth current = startMonth;
+        while (!current.isAfter(endMonth)) {
+            String monthLabel = current.toString();
+            List<Campaign> monthCampaigns = grouped.getOrDefault(monthLabel, Collections.emptyList());
+
+            CampaignMonthlyStatisticsResponse.MonthlyMetrics metrics = calculateMetrics(monthLabel, monthCampaigns);
+            monthlyData.add(metrics);
+
+            // Accumulate overall status
+            monthCampaigns.forEach(c -> overallStatusDistribution.merge(c.getStatus().name(), 1L, (v1, v2) -> v1 + v2));
+
+            current = current.plusMonths(1);
+        }
+
+        return CampaignMonthlyStatisticsResponse.builder()
+                .monthlyData(monthlyData)
+                .statusDistribution(overallStatusDistribution)
+                .build();
+    }
+
+    private CampaignMonthlyStatisticsResponse.MonthlyMetrics calculateMetrics(String month, List<Campaign> campaigns) {
+        long totalCount = campaigns.size();
+        Map<String, Long> statusCount = campaigns.stream()
+                .collect(Collectors.groupingBy(c -> c.getStatus().name(), Collectors.counting()));
+
+        long reserved = statusCount.getOrDefault(Status.RESERVED.name(), 0L)
+                + statusCount.getOrDefault(Status.VISITED.name(), 0L)
+                + statusCount.getOrDefault(Status.DONE.name(), 0L);
+        long visited = statusCount.getOrDefault(Status.VISITED.name(), 0L)
+                + statusCount.getOrDefault(Status.DONE.name(), 0L);
+        double visitRate = reserved == 0 ? 0 : (double) visited / reserved;
+
+        long done = statusCount.getOrDefault(Status.DONE.name(), 0L);
+        long reviewCount = campaigns.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getReceiptReview()) && c.getStatus() == Status.DONE)
+                .count();
+        double reviewRate = done == 0 ? 0 : (double) reviewCount / done;
+
+        long totalSupport = campaigns.stream().mapToLong(c -> c.getSupportAmount() != null ? c.getSupportAmount() : 0)
+                .sum();
+        long totalExtra = campaigns.stream().mapToLong(c -> c.getExtraCost() != null ? c.getExtraCost() : 0).sum();
+        long totalExp = totalSupport + totalExtra;
+        double avgExp = totalCount == 0 ? 0 : (double) totalExp / totalCount;
+
+        return CampaignMonthlyStatisticsResponse.MonthlyMetrics.builder()
+                .month(month)
+                .totalCount(totalCount)
+                .statusCount(statusCount)
+                .visitRate(visitRate)
+                .reviewCount(reviewCount)
+                .reviewRate(reviewRate)
+                .totalSupportAmount(totalSupport)
+                .totalExtraCost(totalExtra)
+                .totalExpenditure(totalExp)
+                .averageExpenditure(avgExp)
+                .build();
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)

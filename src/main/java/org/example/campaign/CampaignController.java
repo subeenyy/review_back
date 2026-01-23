@@ -118,4 +118,15 @@ public class CampaignController {
                 return campaignService.findCampaigns(userId, status, sort);
         }
 
+        @GetMapping("/statistics/monthly")
+        public CampaignMonthlyStatisticsResponse getMonthlyStatistics(
+                        @RequestHeader("Authorization") String token,
+                        @RequestParam String startMonth,
+                        @RequestParam String endMonth,
+                        @RequestParam(defaultValue = "deadline") String base,
+                        @RequestParam(required = false) Long categoryId) {
+                Long userId = extractUserId(token);
+                return campaignService.getMonthlyStatistics(userId, startMonth, endMonth, base, categoryId);
+        }
+
 }
