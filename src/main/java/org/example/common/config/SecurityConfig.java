@@ -1,6 +1,7 @@
 package org.example.common.config;
 
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
+@Slf4j
 public class SecurityConfig {
 
         @Value("${jwt.secret}")
@@ -66,6 +68,16 @@ public class SecurityConfig {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        log.error("Unauthorized error: {}", authException.getMessage());
+                                                        response.sendError(401, authException.getMessage());
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        log.error("Access denied error: {}",
+                                                                        accessDeniedException.getMessage());
+                                                        response.sendError(403, accessDeniedException.getMessage());
+                                                }))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 "/swagger-ui/**",

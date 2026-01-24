@@ -3,6 +3,7 @@ package org.example.user;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 import org.example.common.entity.BaseEntity;
@@ -10,6 +11,7 @@ import org.example.common.entity.BaseEntity;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -35,6 +37,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private LoginType loginType = LoginType.REGULAR;
+
+    @Builder.Default
+    private boolean notificationEnabled = true;
+
+    @Builder.Default
+    private Integer notificationHour = 9; // Default 9 AM
 
     public enum LoginType {
         REGULAR,

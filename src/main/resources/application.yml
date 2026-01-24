@@ -12,6 +12,18 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-email@gmail.com
+    password: your-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   datasource:
     url: jdbc:mysql://localhost:3306/review
     username: root
@@ -42,6 +54,7 @@ logging:
     org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
     p6spy: DEBUG
     root: info
+    org.springframework.security: debug
     org.springframework.data.jpa.repository: error
   pattern:
     console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
