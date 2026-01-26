@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.example.common.config.TestCacheConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -13,16 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class RedisCacheIntegrationTest {
+@ActiveProfiles("test")
+@Import(TestCacheConfig.class)
+public class RedisCacheIntegrationTest {
 
     @Autowired
     private CampaignService campaignService;
 
     @MockBean
     private CampaignRepository campaignRepository;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Test
     @DisplayName("findAllByUserId - 캐시 적용 시 DB 조회 1회 수행 검증 (HIT)")
