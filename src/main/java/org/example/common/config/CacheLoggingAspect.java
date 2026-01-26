@@ -34,25 +34,30 @@ public class CacheLoggingAspect {
         Method method = signature.getMethod();
         Object[] args = joinPoint.getArgs();
 
-        String cacheName = cacheable.value()[0];
-        String keyExpression = cacheable.key();
+        try {
+            String cacheName = cacheable.value()[0];
+            String keyExpression = cacheable.key();
 
-        // SpEL evaluation to get the cache key
-        MethodBasedEvaluationContext context = new MethodBasedEvaluationContext(
-                joinPoint.getTarget(), method, args, nameDiscoverer);
-        Expression expression = parser.parseExpression(keyExpression);
-        String key = expression.getValue(context, String.class);
+            // SpEL evaluation to get the cache key
+            MethodBasedEvaluationContext context = new MethodBasedEvaluationContext(
+                    joinPoint.getTarget(), method, args, nameDiscoverer);
+            Expression expression = parser.parseExpression(keyExpression);
+            String key = expression.getValue(context, String.class);
 
-        Cache cache = cacheManager.getCache(cacheName);
-        if (cache != null) {
-            Cache.ValueWrapper wrapper = cache.get(key);
-            if (wrapper != null) {
-                log.info(">>> [CACHE] HIT - Key: [{}:{}], Method: [{}]", cacheName, key, method.getName());
-                return wrapper.get();
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache != null) {
+                Cache.ValueWrapper wrapper = cache.get(key);
+                if (wrapper != null) {
+                    log.info(">>> [CACHE] HIT - Key: [{}:{}], Method: [{}]", cacheName, key, method.getName());
+                    return wrapper.get(); // HIT
+                }
             }
+            log.info(">>> [CACHE] MISS - Key: [{}:{}], Method: [{}] - Proceeding to DB", cacheName, key,
+                    method.getName());
+        } catch (Exception e) {
+            log.warn("Cache logging failed: {}", e.getMessage());
         }
 
-        log.info(">>> [CACHE] MISS - Key: [{}:{}], Method: [{}] - Proceeding to DB", cacheName, key, method.getName());
         return joinPoint.proceed();
     }
 }

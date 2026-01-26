@@ -19,7 +19,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "categories")
+    @Cacheable(value = "categories", key = "'active'")
     public List<CategoryResponseDto> getActiveCategories() {
         log.info(">>> [CACHE] MISS - Fetching active categories from DB");
         return categoryRepository.findAllActive().stream()
