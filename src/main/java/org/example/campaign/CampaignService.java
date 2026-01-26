@@ -64,7 +64,10 @@ public class CampaignService {
         return campaignRepository.saveAndFlush(campaign);
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "campaigns", key = "'user:' + #userId + ':all'")
     public List<Campaign> findAllByUserId(Long userId) {
+        log.info(">>> [CACHE] MISS - Fetching all campaigns from DB for userId={}", userId);
         return campaignRepository.findByUserId(userId);
     }
 
@@ -163,7 +166,7 @@ public class CampaignService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "campaigns", key = "'user:' + #userId + ':status:' + #status + ':order:' + #sort")
+    @Cacheable(value = "campaigns", key = "'user:' + #userId + ':status:' + (#status != null ? #status.name() : 'all') + ':order:' + #sort.toString()")
     public List<CampaignResponseDto> findCampaigns(
             Long userId,
             Status status,
