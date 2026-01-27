@@ -1,12 +1,10 @@
 # 프로덕션 환경 설정
 spring:
-  # Redis 비활성화 (Railway에 Redis 없을 경우)
+  # Redis 활성화 (Railway Redis 사용)
   data:
     redis:
-      repositories:
-        enabled: false
-  cache:
-    type: none  # Redis 대신 메모리 캐시 사용
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   
   # Kafka 비활성화 (Railway에 Kafka 없을 경우)
   kafka:
