@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EntityScan("org.example")
 @SpringBootApplication
-@EnableJpaAuditing
 public class ReviewManageApplication {
     public static void main(String[] args) {
         System.out.println(">>> STARTING APPLICATION...");
