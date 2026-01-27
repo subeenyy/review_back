@@ -3,8 +3,12 @@ spring:
   # Redis 활성화 (Railway Redis 사용)
   data:
     redis:
+      # REDIS_URL이 있으면 우선 사용 (redis://user:pass@host:port)
+      url: ${REDIS_URL:}
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      username: ${REDIS_USER:default}
+      password: ${REDIS_PASSWORD:}
   
   # Kafka 비활성화 (Railway에 Kafka 없을 경우)
   kafka:
