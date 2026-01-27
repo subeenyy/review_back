@@ -3,11 +3,14 @@ server:
   address: 0.0.0.0
 
 spring:
-  # Redis 활성화 (Railway Redis 사용)
+  cache:
+    type: ${CACHE_TYPE:none}
   data:
     redis:
-      # REDIS_URL이 있으면 우선 사용 (redis://user:pass@host:port)
-      url: ${REDIS_URL:}
+      # URL 설정을 제거하여 환경변수가 없을 때 크래시 방지
+      # Railway에서 REDIS_URL 환경변수를 주면 자동으로 인식됨
+      repositories:
+        enabled: false
   
   # Kafka 비활성화 (Railway에 Kafka 없을 경우)
   kafka:
