@@ -1,0 +1,23 @@
+# 프로덕션 환경 설정
+spring:
+  # Redis 비활성화 (Railway에 Redis 없을 경우)
+  data:
+    redis:
+      repositories:
+        enabled: false
+  cache:
+    type: none  # Redis 대신 메모리 캐시 사용
+  
+  # Kafka 비활성화 (Railway에 Kafka 없을 경우)
+  kafka:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+# 로깅 레벨 조정
+logging:
+  level:
+    root: INFO
+    org.example: DEBUG
+    org.springframework.security: INFO
