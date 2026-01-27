@@ -37,3 +37,9 @@ logging:
     root: INFO
     org.example: DEBUG
     org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
