@@ -12,12 +12,12 @@ spring:
       repositories:
         enabled: false
   
-#  # Kafka 비활성화 (Railway에 Kafka 없을 경우)
-#  kafka:
-#    enabled: false
-#  autoconfigure:
-#    exclude:
-#      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+  # Kafka 비활성화 (Railway에 Kafka 없을 경우)
+  kafka:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 
   # JPA 설정: 스키마 자동 업데이트
   jpa:
