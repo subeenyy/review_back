@@ -7,7 +7,7 @@ buildCommand = "./gradlew clean bootJar -x test"
 
 [deploy]
 startCommand = "java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar build/libs/review-manage-0.0.1-SNAPSHOT.jar"
-healthcheckPath = "/auth/ping"
+healthcheckPath = "/ping"
 healthcheckTimeout = 100
 healthcheckMaxRetries = 10
 restartPolicyType = "ON_FAILURE"
