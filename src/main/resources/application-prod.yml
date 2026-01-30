@@ -11,7 +11,7 @@ spring:
       repositories:
         enabled: false
   
-  # Kafka 비활성화 (운영 환경)
+  # Kafka 비활성화 
   kafka:
     enabled: false
   autoconfigure:
@@ -26,15 +26,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        # 임시로 SQL 로깅 레벨 높임
-        show_sql: true
+        show_sql: false
 
 # 로깅 레벨 조정
 logging:
   level:
     root: INFO
-    org.example: DEBUG
-    org.springframework.security: INFO
+    org.example: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
 
 management:
   endpoints:
