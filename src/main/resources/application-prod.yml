@@ -5,25 +5,27 @@ server:
 
 spring:
   cache:
-    type: none
+    type: redis
   data:
     redis:
+      host: ${REDISHOST:localhost}
+      port: ${REDISPORT:6379}
+      password: ${REDISPASSWORD:}
       repositories:
         enabled: false
   
-  # Kafka & Redis 완전 비활성화 (장애 격리)
+  # Kafka 비활성화
   kafka:
     enabled: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 
-  # JPA 설정: DB 연결 실패해도 기동되도록 최소화
+  # JPA 설정: 스키마 자동 업데이트
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
