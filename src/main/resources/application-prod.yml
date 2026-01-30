@@ -4,15 +4,14 @@ server:
 
 spring:
   cache:
-    type: ${CACHE_TYPE:none}
+    type: redis
   data:
     redis:
-      # URL 설정을 제거하여 환경변수가 없을 때 크래시 방지
-      # Railway에서 REDIS_URL 환경변수를 주면 자동으로 인식됨
+      url: ${REDIS_URL}
       repositories:
         enabled: false
   
-  # Kafka 비활성화 (Railway에 Kafka 없을 경우)
+  # Kafka 비활성화 (운영 환경)
   kafka:
     enabled: false
   autoconfigure:
