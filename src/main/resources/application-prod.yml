@@ -4,13 +4,9 @@ server:
 
 spring:
   cache:
-    type: redis
+    type: none # 임시로 캐시 끄기 (장애 격리용)
   data:
     redis:
-      # Railway에서 자동으로 제공하는 개별 변수들을 우선적으로 사용합니다.
-      host: ${REDISHOST:localhost}
-      port: ${REDISPORT:6379}
-      password: ${REDISPASSWORD:}
       repositories:
         enabled: false
   
@@ -25,7 +21,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none # 임시로 DB 스키마 체크 끄기
     properties:
       hibernate:
         format_sql: true
