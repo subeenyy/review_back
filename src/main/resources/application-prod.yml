@@ -52,4 +52,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, metrics, prometheus// Force trigger: Fri Jan 30 22:00:45 KST 2026
+        include: health, metrics, prometheus
+# Force trigger: Fri Jan 30 22:00:45 KST 2026
