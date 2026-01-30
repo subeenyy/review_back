@@ -1,27 +1,29 @@
 # 프로덕션 환경 설정
 server:
+  port: ${PORT:8080}
   address: 0.0.0.0
 
 spring:
   cache:
-    type: none # 임시로 캐시 끄기 (장애 격리용)
+    type: none
   data:
     redis:
       repositories:
         enabled: false
   
-  # Kafka 비활성화 
+  # Kafka & Redis 완전 비활성화 (장애 격리)
   kafka:
     enabled: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 
-  # JPA 설정: 스키마 자동 업데이트
+  # JPA 설정: DB 연결 실패해도 기동되도록 최소화
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none # 임시로 DB 스키마 체크 끄기
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
