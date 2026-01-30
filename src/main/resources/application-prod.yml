@@ -9,8 +9,8 @@ spring:
   data:
     redis:
       url: ${REDIS_URL:}
-      host: ${REDISHOST:}
-      port: ${REDISPORT:}
+      host: ${REDISHOST:localhost}
+      port: ${REDISPORT:6379}
       password: ${REDISPASSWORD:}
       repositories:
         enabled: false
