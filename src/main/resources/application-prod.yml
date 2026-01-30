@@ -7,7 +7,11 @@ spring:
     type: redis
   data:
     redis:
-      url: ${REDIS_URL}
+      # URL이 있으면 URL을 사용하고, 없으면 개별 호스트 설정을 시도합니다.
+      url: ${REDIS_URL:}
+      host: ${REDISHOST:localhost}
+      port: ${REDISPORT:6379}
+      password: ${REDISPASSWORD:}
       repositories:
         enabled: false
   
