@@ -35,7 +35,10 @@ public class SecurityConfig {
                                 jwtSecret.length(),
                                 jwtSecret.substring(0, Math.min(10, jwtSecret.length())));
                 SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-                return NimbusJwtDecoder.withSecretKey(key).build();
+                // ✅ 알고리즘을 명시적으로 HS256으로 지정
+                return NimbusJwtDecoder.withSecretKey(key)
+                                .macAlgorithm(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS256)
+                                .build();
         }
 
         @Bean
