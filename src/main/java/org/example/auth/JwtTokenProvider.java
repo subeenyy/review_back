@@ -41,7 +41,8 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(
-                        Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                        Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)),
+                        io.jsonwebtoken.SignatureAlgorithm.HS256) // ✅ 명시적으로 HS256 지정
                 .compact();
     }
 
