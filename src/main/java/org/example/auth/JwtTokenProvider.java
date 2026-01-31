@@ -38,19 +38,17 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(
-                        Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8))
-                )
+                        Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
 
     public Long getUserId(String token) {
         return Long.parseLong(
                 Jwts.parserBuilder()
-                        .setSigningKey(secretKey.getBytes())
+                        .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                         .build()
                         .parseClaimsJws(token)
                         .getBody()
-                        .getSubject()
-        );
+                        .getSubject());
     }
 }
