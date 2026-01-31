@@ -33,6 +33,9 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date exp = new Date(now.getTime() + validity);
 
+        System.out.println("🔑 Creating token - JWT_SECRET length: " + secretKey.length() +
+                ", first 10 chars: " + secretKey.substring(0, Math.min(10, secretKey.length())));
+
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)

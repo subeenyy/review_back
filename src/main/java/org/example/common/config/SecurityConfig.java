@@ -31,6 +31,9 @@ public class SecurityConfig {
 
         @Bean
         public JwtDecoder jwtDecoder() {
+                log.info("🔑 JWT_SECRET length: {}, first 10 chars: {}",
+                                jwtSecret.length(),
+                                jwtSecret.substring(0, Math.min(10, jwtSecret.length())));
                 SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
                 return NimbusJwtDecoder.withSecretKey(key).build();
         }
