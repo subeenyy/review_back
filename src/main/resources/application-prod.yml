@@ -21,7 +21,6 @@ spring:
 
   # JPA 설정: DB 연결 실패해도 기동되도록 최소화
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     properties:

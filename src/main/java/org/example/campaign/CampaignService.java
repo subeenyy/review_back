@@ -39,15 +39,12 @@ public class CampaignService {
             PlatformRepository platformRepository,
             CategoryRepository categoryRepository,
             UserRepository userRepository,
-            CampaignMapper campaignMapper,
-            @org.springframework.beans.factory.annotation.Autowired(required = false) Object kafkaTemplate) {
+            CampaignMapper campaignMapper) {
         this.campaignRepository = campaignRepository;
         this.platformRepository = platformRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.campaignMapper = campaignMapper;
-        // this.kafkaTemplate = Optional.ofNullable((KafkaTemplate<String,
-        // ReviewSubmittedEvent>) kafkaTemplate);
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "campaigns", allEntries = true)
