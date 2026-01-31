@@ -42,6 +42,8 @@ logging:
     root: INFO
     org.example: INFO
     org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: TRACE
     org.hibernate: INFO
 
 management:
